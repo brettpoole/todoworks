@@ -21,14 +21,13 @@ const ui = reactive({
 const form = useForm({
     title: '',
     description: '',
-    completed_at: null
+    completed_at: null,
 });
 
 const submit = () => {
     form.post(route('todos.store'), {
         preserveScroll: true,
         onFinish: () => {
-            showForm = false;
             form.reset();
             ui.showForm = false;
             console.log(ui.showForm);
@@ -95,6 +94,7 @@ const create = () => {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div v-bind:key="todo.id" v-for="todo in todos" class="p-6 bg-white border-b border-gray-200">
+                        <input @click="completeTask(todo.id)" type="checkbox" class="checked:bg-blue-500 border rounded mr-3" />
                         {{ todo.title }} <span v-if="todo.description">- {{ todo.description }}</span>
                     </div>
                 </div>

@@ -15,18 +15,15 @@ class TodoRepository
      * @param StoreTodoRequest $request
      * @param User $user
      * @return Todo|null
+     * @throws Exception
      */
     public static function createFromRequest(StoreTodoRequest $request, User $user): ?Todo
     {
-        try {
-            $fields = [
-                ...$request->all(),
-                'user_id' => $user->id,
-            ];
+        $fields = [
+            ...$request->all(),
+            'user_id' => $user->id,
+        ];
 
-            return Todo::create($fields);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return Todo::create($fields);
     }
 }

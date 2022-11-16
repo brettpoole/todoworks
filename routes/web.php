@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Requests\StoreTodoRequest;
+use App\Models\Todo;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,7 +34,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/todos', function () {
     return Inertia::render('Todos/Index', [
-        'todos' => auth()->user()->todos,
+        'todos' => auth()->user()->todos()->active()->get(),
     ]);
 })->middleware(['auth', 'verified'])->name('todos');
 
@@ -41,5 +42,9 @@ Route::post('/todos', function (StoreTodoRequest $request) {
     TodoRepository::createFromRequest($request, auth()->user());
     return Redirect::route('todos');
 })->middleware(['auth', 'verified'])->name('todos.store');
+
+Route::post('/todos/{todo}/complete', function (Todo $todo) {
+    $todo->complete();
+})->middleware(['auth', 'verified'])->name('todos.complete');
 
 require __DIR__.'/auth.php';
