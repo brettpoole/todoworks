@@ -7,10 +7,16 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/inertia-vue3';
-import { Inertia } from '@inertiajs/inertia'
-import { ref } from 'vue'
+import { reactive } from '@vue/reactivity';
+import { Inertia } from '@inertiajs/inertia';
+import { ref } from 'vue';
 
-const props = defineProps(['todos', 'showForm'])
+
+const props = defineProps(['todos'])
+
+const ui = reactive({
+  showForm: false
+});
 
 const form = useForm({
     title: '',
@@ -24,14 +30,30 @@ const submit = () => {
         onFinish: () => {
             showForm = false;
             form.reset();
+            ui.showForm = false;
+            console.log(ui.showForm);
             Inertia.reload({ only: ['todos'] });
         }
     });
 };
 
+const completeTask = (todoId) => {
+    form.post(route('todos.complete', todoId), {
+        preserveScroll: true,
+        onFinish: () => {
+            Inertia.reload({ only: ['todos'] });
+        }
+    });
+};
+
+const create = () => {
+    ui.showForm = !ui.showForm;
+    console.log(ui.showForm);
+};
 </script>
 
 <template>
+    <div v-if="ui.showForm" class="absolute opacity-75 min-h-full h-full min-w-full bg-gray-600 z-10"></div>
     <Head title="Todos" />
 
     <AuthenticatedLayout>
@@ -40,12 +62,11 @@ const submit = () => {
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Todos
                 </h2>
-                <primary-button @click="showForm = !showForm" class="bg-green-600">Add Todo</primary-button>
+                <primary-button @click="create()" class="bg-green-600">Add Todo</primary-button>
             </div>
         </template>
-        
-        <div v-if="showForm" class="absolute opacity-75 min-h-full min-w-full bg-gray-600"></div>
-        <div class="py-12 absolute top-1/4 inset-0" v-if="showForm">
+
+        <div class="py-12 absolute top-1/4 inset-0 z-20" v-if="ui.showForm">
             <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-2 border-gray-100">
                     <form @submit.prevent="submit">
